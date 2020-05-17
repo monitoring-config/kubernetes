@@ -1,0 +1,23 @@
+groups:
+- name: kube-apiserver.rules
+  rules:
+  - expr: |
+      sum(rate(apiserver_request_duration_seconds_sum{subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}[5m]))
+      /
+      sum(rate(apiserver_request_duration_seconds_count{subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}[5m]))
+    record: cluster:apiserver_request_duration_seconds:mean5m
+  - expr: |
+      histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}[5m])))
+    labels:
+      quantile: "0.99"
+    record: cluster_quantile:apiserver_request_duration_seconds:histogram_quantile
+  - expr: |
+      histogram_quantile(0.9, sum(rate(apiserver_request_duration_seconds_bucket{subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}[5m])))
+    labels:
+      quantile: "0.9"
+    record: cluster_quantile:apiserver_request_duration_seconds:histogram_quantile
+  - expr: |
+      histogram_quantile(0.5, sum(rate(apiserver_request_duration_seconds_bucket{subresource!="log",verb!~"LIST|WATCH|WATCHLIST|PROXY|CONNECT"}[5m])))
+    labels:
+      quantile: "0.5"
+        record: cluster_quantile:apiserver_request_duration_seconds:histogram_quantile

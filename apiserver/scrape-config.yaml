@@ -1,0 +1,25 @@
+    - job_name: apiserver
+      honor_labels: false
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - default
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      scheme: https
+      tls_config:
+        insecure_skip_verify: false
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      relabel_configs:
+      - action: keep
+        source_labels:
+        - __meta_kubernetes_service_label_component
+        regex: apiserver
+      - action: keep
+        source_labels:
+        - __meta_kubernetes_service_label_provider
+        regex: kubernetes
+      - action: keep
+        source_labels:
+        - __meta_kubernetes_endpoint_port_name
+        regex: https

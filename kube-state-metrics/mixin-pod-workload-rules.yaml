@@ -1,0 +1,36 @@
+groups:
+- name: kube-state-metrics.rules
+  rules:
+  - expr: |-
+      sum(
+        label_replace(
+          label_replace(
+            kube_pod_owner{job="kube-state-metrics", owner_kind="ReplicaSet"},
+            "replicaset", "$1", "owner_name", "(.*)"
+          ) * on(replicaset, namespace) group_left(owner_name) kube_replicaset_owner{job="kube-state-metrics"},
+          "workload", "$1", "owner_name", "(.*)"
+        )
+      ) by (namespace, workload, pod)
+    labels:
+      workload_type: deployment
+    record: mixin_pod_workload
+  - expr: |-
+      sum(
+        label_replace(
+          kube_pod_owner{job="kube-state-metrics", owner_kind="DaemonSet"},
+          "workload", "$1", "owner_name", "(.*)"
+        )
+      ) by (namespace, workload, pod)
+    labels:
+      workload_type: daemonset
+    record: mixin_pod_workload
+  - expr: |-
+      sum(
+        label_replace(
+          kube_pod_owner{job="kube-state-metrics", owner_kind="StatefulSet"},
+          "workload", "$1", "owner_name", "(.*)"
+        )
+      ) by (namespace, workload, pod)
+    labels:
+      workload_type: statefulset
+    record: mixin_pod_workload
