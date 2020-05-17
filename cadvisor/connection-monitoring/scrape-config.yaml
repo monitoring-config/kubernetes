@@ -1,4 +1,4 @@
-- job_name: cadvisor-ds
+- job_name: cadvisor
   honor_labels: false
   kubernetes_sd_configs:
   - role: endpoints
@@ -21,7 +21,7 @@
     replacement: ${1}
   metric_relabel_configs:
   - source_labels: [ __name__ ]
-    regex: 'container_network_tcp_usage_total'
+    regex: 'container_network_tcp_usage_total|container_network_tcp6_usage_total'
     action: keep
   - source_labels: [container_label_io_kubernetes_pod_name]
     target_label: pod
